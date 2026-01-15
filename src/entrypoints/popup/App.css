@@ -1,0 +1,375 @@
+.container {
+  width: 400px;
+  padding: 20px;
+  font-family:
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu',
+    'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+}
+
+header {
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+header h1 {
+  margin: 0 0 8px 0;
+  font-size: 24px;
+  color: #1a1a1a;
+}
+
+header p {
+  margin: 0 0 16px 0;
+  font-size: 13px;
+  color: #666;
+}
+
+/* Guide Steps */
+.header-guide {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background: linear-gradient(135deg, #f0f9ff 0%, #faf5ff 100%);
+  border: 2px solid #e0e7ff;
+  border-radius: 8px;
+  padding: 12px;
+  margin-top: 12px;
+}
+
+.guide-step {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  color: #334155;
+}
+
+.step-number {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+  color: white;
+  border-radius: 50%;
+  font-weight: 700;
+  font-size: 11px;
+  flex-shrink: 0;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form-group label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #333;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.label-text {
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.label-hint {
+  font-size: 11px;
+  font-weight: 400;
+  color: #64748b;
+  font-style: italic;
+}
+
+.form-group select {
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 14px;
+  font-family: inherit;
+  transition: border-color 0.2s;
+}
+
+.form-group select:focus {
+  outline: none;
+  border-color: #4a90e2;
+}
+
+/* Preset List */
+.preset-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* Preset Option */
+.preset-option {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px;
+  border: 2px solid #e5e7eb;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.preset-option:hover {
+  border-color: #8b5cf6;
+  background: #f9fafb;
+}
+
+.preset-option:has(input:checked) {
+  border-color: #6366f1;
+  background: #f0f9ff;
+}
+
+.preset-option input[type='radio'] {
+  margin-top: 2px;
+  cursor: pointer;
+  accent-color: #6366f1;
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+
+/* Preset Content */
+.preset-content {
+  display: flex;
+  gap: 10px;
+  flex: 1;
+  align-items: flex-start;
+}
+
+.preset-icon {
+  font-size: 20px;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.preset-text {
+  flex: 1;
+}
+
+.preset-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1e293b;
+  margin-bottom: 2px;
+}
+
+.preset-description {
+  font-size: 12px;
+  color: #64748b;
+  line-height: 1.3;
+}
+
+.error-message {
+  padding: 12px;
+  background: #fee;
+  border: 1px solid #fcc;
+  border-radius: 6px;
+  color: #c33;
+  font-size: 13px;
+}
+
+.success-message {
+  padding: 12px;
+  background: #efe;
+  border: 1px solid #cfc;
+  border-radius: 6px;
+  color: #3a3;
+  font-size: 13px;
+}
+
+.video-title {
+  margin-top: 8px;
+  font-size: 12px;
+  color: #666;
+  font-weight: 600;
+}
+
+.submit-btn {
+  padding: 14px;
+  background: #4a90e2;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.submit-btn:hover {
+  background: #357abd;
+}
+
+.submit-btn:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
+footer {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid #eee;
+  text-align: center;
+}
+
+footer small {
+  font-size: 11px;
+  color: #999;
+  line-height: 1.4;
+}
+
+/* Customize Prompts Button */
+.customize-prompts-btn {
+  margin-top: 8px;
+  width: 100%;
+  padding: 10px 16px;
+  background: white;
+  color: #6366f1;
+  border: 2px solid #e0e7ff;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.customize-prompts-btn:hover:not(:disabled) {
+  background: #f0f9ff;
+  border-color: #6366f1;
+}
+
+.customize-prompts-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .container {
+    background: #1e1e1e;
+    color: #e4e4e4;
+  }
+
+  header h1 {
+    color: #e4e4e4;
+  }
+
+  header p {
+    color: #9ca3af;
+  }
+
+  .header-guide {
+    background: linear-gradient(135deg, #1e3a5f 0%, #2d1b4e 100%);
+    border-color: #3d3d3d;
+  }
+
+  .guide-step {
+    color: #d1d5db;
+  }
+
+  .label-text {
+    color: #e4e4e4;
+  }
+
+  .label-hint {
+    color: #9ca3af;
+  }
+
+  .form-group select {
+    background: #2d2d2d;
+    color: #e4e4e4;
+    border-color: #3d3d3d;
+  }
+
+  .form-group select:focus {
+    border-color: #6366f1;
+  }
+
+  .preset-option {
+    background: #2d2d2d;
+    border-color: #3d3d3d;
+  }
+
+  .preset-option:hover {
+    background: #3d3d3d;
+    border-color: #8b5cf6;
+  }
+
+  .preset-option:has(input:checked) {
+    background: #1e3a5f;
+    border-color: #6366f1;
+  }
+
+  .preset-title {
+    color: #e4e4e4;
+  }
+
+  .preset-description {
+    color: #9ca3af;
+  }
+
+  .customize-prompts-btn {
+    background: #2d2d2d;
+    color: #818cf8;
+    border-color: #3d3d3d;
+  }
+
+  .customize-prompts-btn:hover:not(:disabled) {
+    background: #3d3d3d;
+    border-color: #6366f1;
+  }
+
+  .error-message {
+    background: #3d1f1f;
+    border-color: #5d2f2f;
+    color: #fca5a5;
+  }
+
+  .success-message {
+    background: #1f3d1f;
+    border-color: #2f5d2f;
+    color: #86efac;
+  }
+
+  .video-title {
+    color: #9ca3af;
+  }
+
+  .submit-btn {
+    background: #4a90e2;
+  }
+
+  .submit-btn:hover {
+    background: #357abd;
+  }
+
+  .submit-btn:disabled {
+    background: #3d3d3d;
+  }
+
+  footer {
+    border-top-color: #3d3d3d;
+  }
+
+  footer small {
+    color: #6b7280;
+  }
+}

@@ -1,0 +1,48 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Dependencies
+node_modules
+
+# WXT Build Output
+.output
+.wxt
+stats.html
+stats-*.json
+web-ext.config.ts
+
+# Chrome Extension Builds
+*.crx
+*.pem
+*.zip
+dist/
+build/
+
+# Environment Variables
+.env
+.env.local
+.env.*.local
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# OS
+Thumbs.db
+
+# Testing
+coverage/
+.nyc_output/
