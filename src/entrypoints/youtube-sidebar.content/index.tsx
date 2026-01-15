@@ -2,6 +2,7 @@ import ReactDOM from 'react-dom/client';
 import { createShadowRootUi } from 'wxt/utils/content-script-ui/shadow-root';
 import { I18nProvider } from '@/i18n';
 import App from './App';
+import '@/styles/globals.css';
 import './style.css';
 
 export default defineContentScript({
