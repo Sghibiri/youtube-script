@@ -1,15 +1,18 @@
 import { useState } from 'react';
 import type { LLMProvider } from '@/types';
+import chatgptIcon from '@/assets/icons/llm/chatgpt.svg';
+import claudeIcon from '@/assets/icons/llm/claude.svg';
+import geminiIcon from '@/assets/icons/llm/gemini.svg';
+import grokIcon from '@/assets/icons/llm/grok.svg';
+import deepseekIcon from '@/assets/icons/llm/deepseek.svg';
 
+// Bundled with the extension: no request to a third-party CDN on every page
 const LLM_ICON_URLS: Record<LLMProvider, string> = {
-  chatgpt:
-    'https://unpkg.com/@lobehub/icons-static-svg@latest/icons/openai.svg',
-  claude:
-    'https://unpkg.com/@lobehub/icons-static-svg@latest/icons/anthropic.svg',
-  gemini: 'https://unpkg.com/@lobehub/icons-static-svg@latest/icons/google.svg',
-  grok: 'https://unpkg.com/@lobehub/icons-static-svg@latest/icons/x.svg',
-  deepseek:
-    'https://unpkg.com/@lobehub/icons-static-svg@latest/icons/deepseek.svg',
+  chatgpt: chatgptIcon,
+  claude: claudeIcon,
+  gemini: geminiIcon,
+  grok: grokIcon,
+  deepseek: deepseekIcon,
 };
 
 interface LLMIconProps {
@@ -22,14 +25,14 @@ export function LLMIcon({ provider, className }: LLMIconProps) {
   const iconUrl = LLM_ICON_URLS[provider];
 
   if (error) {
-    // Fallback to text labels if CDN fails
-    return <span className={className}>{provider}</span>;
+    return null;
   }
 
+  // Decorative: the provider name is always shown next to the icon
   return (
     <img
       src={iconUrl}
-      alt={`${provider} icon`}
+      alt=""
       className={className}
       onError={() => setError(true)}
     />

@@ -32,6 +32,10 @@
     --color-border-secondary: #e0e0e0;
     --color-border-focus: var(--color-primary);
 
+    /* Clickable text (times) and filled buttons: 4.5:1 at small sizes */
+    --color-link: #4f46e5;
+    --color-action: #4f46e5;
+
     /* Typography */
     --font-sans:
       -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica',
@@ -64,31 +68,11 @@
     --z-modal: 10000;
   }
 
-  /* Dark Mode - System Preference */
-  @media (prefers-color-scheme: dark) {
-    :root {
-      --color-primary: #818cf8;
-      --color-primary-dark: #6366f1;
-      --color-primary-light: #a5b4fc;
-
-      --color-bg-primary: #212121;
-      --color-bg-secondary: #2d2d2d;
-      --color-bg-tertiary: #3d3d3d;
-      --color-bg-elevated: #2d2d2d;
-
-      --color-text-primary: #e4e4e4;
-      --color-text-secondary: #9ca3af;
-      --color-text-tertiary: #6b7280;
-
-      --color-border-primary: #3d3d3d;
-      --color-border-secondary: #3a3a3a;
-
-      --shadow-card: 0 2px 8px rgba(0, 0, 0, 0.5);
-      --shadow-elevated: 0 4px 16px rgba(0, 0, 0, 0.5);
-    }
-  }
-
-  /* YouTube Dark Mode Override (for content script) */
+  /*
+   * Dark mode: driven by a [dark] attribute so colors and dark: classes always
+   * agree. YouTube's theme is mirrored into the sidebar; the popup follows the
+   * system setting (see popup/main.tsx).
+   */
   html[dark] {
     --color-primary: #818cf8;
     --color-primary-dark: #6366f1;
@@ -105,6 +89,8 @@
 
     --color-border-primary: #3d3d3d;
     --color-border-secondary: #3a3a3a;
+
+    --color-link: #818cf8;
 
     --shadow-card: 0 2px 8px rgba(0, 0, 0, 0.5);
     --shadow-elevated: 0 4px 16px rgba(0, 0, 0, 0.5);

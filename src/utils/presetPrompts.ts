@@ -1,44 +1,36 @@
 import type { PresetPrompt } from '@/types';
 import type { TranslationStrings, PromptTranslations } from '@/i18n/types';
+import {
+  strings as enStrings,
+  prompts as enPrompts,
+} from '@/i18n/translations/en';
+import { ANSWER_LANGUAGES, VIDEO_LANGUAGE } from '@/i18n';
 
-// Default preset prompts - used when no i18n context available
-export const DEFAULT_PRESET_PROMPTS: PresetPrompt[] = [
-  {
-    id: 'summary',
-    title: 'Summary',
-    description: 'Key points',
-    prompt:
-      'Summarize this video in 5-7 bullet points, focusing on the main ideas and actionable insights.',
-    icon: '📋',
-  },
-  {
-    id: 'business',
-    title: 'Business',
-    description: 'Strategy tips',
-    prompt:
-      'Extract business insights, market trends, and strategic opportunities discussed in this video.',
-    icon: '📊',
-  },
-  {
-    id: 'action-plan',
-    title: 'Action Plan',
-    description: 'Steps to do',
-    prompt:
-      'Create an action plan with concrete steps to implement the ideas from this video.',
-    icon: '✅',
-  },
-  {
-    id: 'learning',
-    title: 'Learn',
-    description: 'Main ideas',
-    prompt:
-      'Explain the key concepts, frameworks, and best practices covered in this video.',
-    icon: '🎓',
-  },
-];
+export const DEFAULT_PROMPT_ID = 'key-moments';
 
-// For backwards compatibility
-export const PRESET_PROMPTS = DEFAULT_PRESET_PROMPTS;
+/**
+ * The full task sent to the AI: what to do, the shared answer shape (short
+ * summary first, then a brief list) and the language to answer in.
+ * Free questions bring their own shape, so they skip the shared one.
+ */
+export function buildTask(
+  task: string,
+  prompts: PromptTranslations,
+  answerLanguage: string,
+  { shared = true }: { shared?: boolean } = {}
+): string {
+  const name = ANSWER_LANGUAGES.find(
+    (language) => language.code === answerLanguage
+  )?.name;
+  const languageLine =
+    answerLanguage === VIDEO_LANGUAGE || !name
+      ? prompts.answerInVideo
+      : prompts.answerIn.replace('{language}', name);
+
+  return [task, shared ? prompts.format : null, languageLine]
+    .filter((part): part is string => Boolean(part))
+    .join('\n\n');
+}
 
 // Get localized presets using translation strings
 export function getLocalizedPresets(
@@ -47,6 +39,13 @@ export function getLocalizedPresets(
 ): PresetPrompt[] {
   return [
     {
+      id: 'key-moments',
+      title: t.keyMomentsTitle,
+      description: t.keyMomentsDesc,
+      prompt: prompts.keyMoments,
+      icon: '⏱️',
+    },
+    {
       id: 'summary',
       title: t.summaryTitle,
       description: t.summaryDesc,
@@ -54,11 +53,11 @@ export function getLocalizedPresets(
       icon: '📋',
     },
     {
-      id: 'business',
-      title: t.businessTitle,
-      description: t.businessDesc,
-      prompt: prompts.business,
-      icon: '📊',
+      id: 'validate',
+      title: t.validateTitle,
+      description: t.validateDesc,
+      prompt: prompts.validate,
+      icon: '🔎',
     },
     {
       id: 'action-plan',
@@ -66,6 +65,13 @@ export function getLocalizedPresets(
       description: t.actionDesc,
       prompt: prompts.actionPlan,
       icon: '✅',
+    },
+    {
+      id: 'business',
+      title: t.businessTitle,
+      description: t.businessDesc,
+      prompt: prompts.business,
+      icon: '📊',
     },
     {
       id: 'learning',
@@ -76,6 +82,15 @@ export function getLocalizedPresets(
     },
   ];
 }
+
+// Default preset prompts - used when no i18n context available
+export const DEFAULT_PRESET_PROMPTS: PresetPrompt[] = getLocalizedPresets(
+  enStrings,
+  enPrompts
+);
+
+// For backwards compatibility
+export const PRESET_PROMPTS = DEFAULT_PRESET_PROMPTS;
 
 // Helper to merge default prompts with user customizations
 export function getEffectivePrompts(

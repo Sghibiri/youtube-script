@@ -11,6 +11,7 @@ import type {
   TranslationStrings,
   PromptTranslations,
 } from './types';
+import { updatePreferences } from '@/utils/preferences';
 
 // Import all translations statically (bundle size is small)
 import { strings as enStrings, prompts as enPrompts } from './translations/en';
@@ -27,6 +28,43 @@ export const LANGUAGES: LanguageConfig[] = [
   { code: 'de', name: 'Deutsch', flag: '🇩🇪' },
   { code: 'es', name: 'Español', flag: '🇪🇸' },
 ];
+
+/** Answer languages: the interface languages plus a few common extras. */
+export const ANSWER_LANGUAGES: readonly { code: string; name: string }[] = [
+  ...LANGUAGES.map(({ code, name }) => ({ code, name })),
+  { code: 'pt', name: 'Português' },
+];
+
+/** Answer in whatever language the video is in */
+export const VIDEO_LANGUAGE = 'video';
+
+export function isSupportedLanguage(
+  value: unknown
+): value is SupportedLanguage {
+  return LANGUAGES.some((language) => language.code === value);
+}
+
+/** The saved answer language, falling back to the interface language. */
+export function resolveAnswerLanguage(
+  saved: unknown,
+  uiLanguage: SupportedLanguage
+): string {
+  if (saved === VIDEO_LANGUAGE) return VIDEO_LANGUAGE;
+  return ANSWER_LANGUAGES.some((language) => language.code === saved)
+    ? (saved as string)
+    : uiLanguage;
+}
+
+/**
+ * One setting for both: the answer language, and the interface language
+ * when a translation exists for it.
+ */
+export function chooseLanguage(code: string): Promise<void> {
+  return updatePreferences({
+    answerLanguage: code,
+    ...(isSupportedLanguage(code) ? { language: code } : {}),
+  });
+}
 
 // All translations map
 const TRANSLATIONS: Record<
@@ -57,28 +95,39 @@ interface I18nProviderProps {
 export function I18nProvider({ children }: I18nProviderProps) {
   const [language, setLanguageState] = useState<SupportedLanguage>('en');
 
-  // Load language preference from storage on mount
+  // Load the saved language, and follow changes made in the popup or sidebar
   useEffect(() => {
+    let active = true;
     chrome.storage.local.get(['preferences'], (result) => {
-      const prefs = result.preferences as { language?: string } | undefined;
-      if (prefs?.language && LANGUAGES.some((l) => l.code === prefs.language)) {
-        setLanguageState(prefs.language as SupportedLanguage);
+      const prefs = result.preferences as { language?: unknown } | undefined;
+      if (active && isSupportedLanguage(prefs?.language)) {
+        setLanguageState(prefs.language);
       }
     });
+
+    const onChanged = (
+      changes: Record<string, chrome.storage.StorageChange>,
+      area: string
+    ) => {
+      if (area !== 'local' || !changes.preferences) return;
+      const prefs = changes.preferences.newValue as
+        | { language?: unknown }
+        | undefined;
+      if (isSupportedLanguage(prefs?.language)) {
+        setLanguageState(prefs.language);
+      }
+    };
+    chrome.storage.onChanged.addListener(onChanged);
+    return () => {
+      active = false;
+      chrome.storage.onChanged.removeListener(onChanged);
+    };
   }, []);
 
-  // Save language to storage and update state
+  // The flags set the answer language too, so the two never disagree
   const setLanguage = (lang: SupportedLanguage) => {
     setLanguageState(lang);
-
-    // Update preferences in storage
-    chrome.storage.local.get(['preferences'], (result) => {
-      const prefs =
-        (result.preferences as Record<string, unknown> | undefined) || {};
-      chrome.storage.local.set({
-        preferences: { ...prefs, language: lang },
-      });
-    });
+    void chooseLanguage(lang);
   };
 
   // String interpolation: "Hello {name}" + {name: "World"} => "Hello World"

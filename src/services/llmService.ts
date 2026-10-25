@@ -1,72 +1,132 @@
-import type { LLMProvider, LLMRequest } from '@/types';
+import type {
+  LLMProvider,
+  LLMRequest,
+  OpenAIPayload,
+  OpenAIResult,
+  SaveNotePayload,
+  SaveNoteResult,
+} from '@/types';
+import { PROVIDER_INFO } from '@/utils/providers';
 
-/**
- * LLM provider URLs
- */
-const LLM_URLS: Record<LLMProvider, string> = {
-  chatgpt: 'https://chat.openai.com',
-  claude: 'https://claude.ai/new',
-  gemini: 'https://gemini.google.com',
-  grok: 'https://x.com/i/grok',
-  deepseek: 'https://chat.deepseek.com',
-};
+export type SendResult =
+  /** watching: the answer will come back to this tab */
+  | { ok: true; autoSend: boolean; watching: boolean }
+  | { ok: false; reason: 'copy' | 'open' | 'reload' };
 
 /**
  * Service for LLM integration
  */
 export const llmService = {
-  /**
-   * Get URL for LLM provider
-   */
-  getProviderUrl: (provider: LLMProvider): string => {
-    return LLM_URLS[provider];
-  },
+  getProviderUrl: (provider: LLMProvider): string =>
+    PROVIDER_INFO[provider].url,
 
   /**
-   * Format the complete prompt with transcript
+   * Build the full message: video info, the timestamped transcript, then the
+   * task (models follow instructions better when they come after long text).
    */
-  formatPrompt: (request: LLMRequest): string => {
+  formatPrompt: (request: Omit<LLMRequest, 'provider'>): string => {
     const { prompt, transcript, videoTitle, videoUrl } = request;
 
-    return `${prompt}
-
-Video: ${videoTitle}
+    return `Video: ${videoTitle}
 URL: ${videoUrl}
 
-Transcript:
-${transcript}`;
+Transcript (each paragraph starts with its [m:ss] timestamp):
+<transcript>
+${transcript}
+</transcript>
+
+${prompt}`;
   },
 
   /**
-   * Copy text to clipboard
+   * Copy text to clipboard. Returns false when the browser refuses.
    */
-  copyToClipboard: async (text: string): Promise<void> => {
+  copyToClipboard: async (text: string): Promise<boolean> => {
     try {
       await navigator.clipboard.writeText(text);
+      return true;
     } catch {
-      // Fallback method for browsers that don't support clipboard API
+      // Fallback for pages where the async clipboard API is blocked
       const textarea = document.createElement('textarea');
       textarea.value = text;
       textarea.style.position = 'fixed';
       textarea.style.opacity = '0';
       document.body.appendChild(textarea);
       textarea.select();
-      document.execCommand('copy');
-      document.body.removeChild(textarea);
+      const copied = document.execCommand('copy');
+      textarea.remove();
+      return copied;
     }
   },
 
   /**
-   * Open LLM provider page with formatted prompt in clipboard
+   * Copy the message (as a fallback) and open the AI in a new tab.
+   * ChatGPT and Claude get the message filled in and sent automatically,
+   * using the account the user is logged in with. With a requestId, their
+   * answer is sent back to this tab and the AI tab opens in the background.
    */
-  openLLMWithTranscript: async (request: LLMRequest): Promise<void> => {
-    const formattedPrompt = llmService.formatPrompt(request);
+  sendToAI: async (
+    provider: LLMProvider,
+    text: string,
+    requestId?: string
+  ): Promise<SendResult> => {
+    const { autofill } = PROVIDER_INFO[provider];
 
-    // Copy to clipboard
-    await llmService.copyToClipboard(formattedPrompt);
+    const copied = await llmService.copyToClipboard(text);
+    if (!copied && !autofill) return { ok: false, reason: 'copy' };
 
-    // Open LLM provider in new tab
-    const url = llmService.getProviderUrl(request.provider);
-    window.open(url, '_blank');
+    try {
+      const payload: OpenAIPayload = { provider, text, requestId };
+      const result = (await browser.runtime.sendMessage({
+        type: 'OPEN_AI',
+        payload,
+      })) as OpenAIResult | undefined;
+
+      return result?.ok
+        ? { ok: true, autoSend: autofill, watching: result.watching }
+        : { ok: false, reason: 'open' };
+    } catch {
+      // The extension was updated or reloaded since this page loaded
+      return { ok: false, reason: 'reload' };
+    }
+  },
+
+  /** Keep an answer as a note in the Library (and the notes folder). */
+  saveNote: async (payload: SaveNotePayload): Promise<SaveNoteResult> => {
+    try {
+      const result = (await browser.runtime.sendMessage({
+        type: 'SAVE_NOTE',
+        payload,
+      })) as SaveNoteResult | undefined;
+      return result?.ok === true ? result : { ok: false };
+    } catch {
+      // The extension was updated or reloaded since this page loaded
+      return { ok: false };
+    }
+  },
+
+  /** Open the Library page, or bring it to the front. */
+  openLibrary: async (): Promise<boolean> => {
+    try {
+      const result = (await browser.runtime.sendMessage({
+        type: 'OPEN_LIBRARY',
+      })) as { ok?: boolean } | undefined;
+      return result?.ok === true;
+    } catch {
+      return false;
+    }
+  },
+
+  /** Bring the ChatGPT / Claude tab that is answering to the front. */
+  focusAITab: async (requestId: string): Promise<boolean> => {
+    try {
+      const result = (await browser.runtime.sendMessage({
+        type: 'FOCUS_AI_TAB',
+        payload: { requestId },
+      })) as { ok?: boolean } | undefined;
+      return result?.ok === true;
+    } catch {
+      return false;
+    }
   },
 };

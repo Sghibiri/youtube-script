@@ -1,3 +1,10 @@
+/**
+ * Lets opacity modifiers (bg-primary/10) work with colors stored in CSS
+ * variables. Without this, Tailwind silently emits nothing for them.
+ */
+const withAlpha = (variable) =>
+  `color-mix(in srgb, var(${variable}) calc(<alpha-value> * 100%), transparent)`;
+
 /** @type {import('tailwindcss').Config} */
 export default {
   content: ['./src/**/*.{ts,tsx}'],
@@ -5,9 +12,9 @@ export default {
   theme: {
     extend: {
       colors: {
-        primary: 'var(--color-primary)',
-        'primary-dark': 'var(--color-primary-dark)',
-        'primary-light': 'var(--color-primary-light)',
+        primary: withAlpha('--color-primary'),
+        'primary-dark': withAlpha('--color-primary-dark'),
+        'primary-light': withAlpha('--color-primary-light'),
         secondary: 'var(--color-secondary)',
         'secondary-dark': 'var(--color-secondary-dark)',
         'secondary-light': 'var(--color-secondary-light)',
