@@ -255,4 +255,4 @@ src/
 
 ## 📝 License
 
-MIT. Use it, change it, share it.
+[MIT](LICENSE). Use it, change it, share it.
